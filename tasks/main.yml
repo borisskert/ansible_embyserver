@@ -7,3 +7,11 @@
     group: root
     mode: 0644
   notify: Restart embyserver service
+
+- name: create config volume directory
+  file:
+    path: "{{ embyserver_config_volume_directory }}"
+    state: directory
+    owner: "{{ embyserver_user_id | int }}"
+    group: "{{ embyserver_group_id | int }}"
+    mode: 0750

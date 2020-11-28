@@ -1,2 +1,7 @@
 ---
 embyserver_service_name: embyserver
+
+embyserver_config_volume_directory: /srv/embyserver/config
+
+embyserver_user_id: 666
+embyserver_group_id: 666

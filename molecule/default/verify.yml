@@ -40,3 +40,14 @@
           Restart=always
           RestartSec=60s
           TimeoutSec=3600
+
+    - name: Should create config volume directory
+      stat:
+        path: /srv/embyserver/config
+      register: config_volume_directory
+      failed_when: not (
+        config_volume_directory.stat.exists
+        and config_volume_directory.stat.uid == 666
+        and config_volume_directory.stat.gid == 666
+        and config_volume_directory.stat.mode == '0750'
+        )
