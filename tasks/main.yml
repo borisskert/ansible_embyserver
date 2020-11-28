@@ -15,3 +15,16 @@
     owner: "{{ embyserver_user_id | int }}"
     group: "{{ embyserver_group_id | int }}"
     mode: 0750
+
+- name: Start systemd-managed docker containers
+  meta: flush_handlers
+
+- name: Enable/start systemd service (if not started)
+  service:
+    name: "{{ embyserver_service_name }}.service"
+    enabled: true
+    state: started
+  when: not (
+    molecule_docker_environment is defined
+    and molecule_docker_environment | bool
+    )
