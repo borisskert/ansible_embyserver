@@ -1,0 +1,56 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Should template systemd unit file
+      slurp:
+        src: /etc/systemd/system/my_embyserver.service
+      register: systemd_unit_file
+      failed_when:
+        not systemd_unit_file.content == ( expected_content | b64encode )
+      vars:
+        expected_content: |
+          [Install]
+          WantedBy=multi-user.target
+
+          [Unit]
+          Description=my_embyserver service
+          After=docker.service
+          Requires=docker.service
+
+          [Service]
+          ExecStartPre=-/usr/bin/docker rm -f my_embyserver.service
+          ExecStartPre=/usr/bin/docker pull emby/embyserver:4.5.2.0
+
+          ExecStart=/usr/bin/docker run \
+              --name my_embyserver.service \
+              --volume /srv/my_embyserver/config:/config \
+              --volume /srv/my_embyserver/movies:/mnt/movies \
+              --volume /srv/my_embyserver/tv:/mnt/tv \
+              --device /dev/dri:/dev/dri \
+              --publish 127.0.0.1:18096:8096 \
+              --publish 127.0.0.1:18920:8920 \
+              --env UID=777 \
+              --env GID=888 \
+              --env GIDLIST=888 \
+              emby/embyserver:4.5.2.0
+
+          ExecStop=/usr/bin/docker stop my_embyserver.service
+          ExecStopPost=-/usr/bin/docker rm -f my_embyserver.service
+
+          Restart=always
+          RestartSec=60s
+          TimeoutSec=3600
+
+    - name: Should create config volume directory
+      stat:
+        path: /srv/my_embyserver/config
+      register: config_volume_directory
+      failed_when: not (
+        config_volume_directory.stat.exists
+        and config_volume_directory.stat.uid == 777
+        and config_volume_directory.stat.gid == 888
+        and config_volume_directory.stat.mode == '0750'
+        )

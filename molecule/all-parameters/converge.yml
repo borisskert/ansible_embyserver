@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  roles:
+    - role: ansible_embyserver
+      embyserver_version: 4.5.2.0
+      embyserver_service_name: my_embyserver
+      embyserver_config_volume_directory: /srv/my_embyserver/config
+      embyserver_interface: 127.0.0.1
+      embyserver_http_port: 18096
+      embyserver_https_port: 18920
+      embyserver_user_id: 777
+      embyserver_group_id: 888
+      embyserver_shares:
+        - name: movies
+          path: /srv/my_embyserver/movies
+        - name: tv
+          path: /srv/my_embyserver/tv
+      embyserver_direct_rendering_enabled: true

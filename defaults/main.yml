@@ -1,7 +1,16 @@
 ---
+embyserver_version: latest
 embyserver_service_name: embyserver
 
 embyserver_config_volume_directory: /srv/embyserver/config
 
 embyserver_user_id: 666
 embyserver_group_id: 666
+
+embyserver_interface: 0.0.0.0
+embyserver_http_port: 8096
+embyserver_https_port: 8920
+
+embyserver_shares: []
+
+embyserver_direct_rendering_enabled: false

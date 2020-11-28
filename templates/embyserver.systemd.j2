@@ -2,26 +2,32 @@
 WantedBy=multi-user.target
 
 [Unit]
-Description=embyserver service
+Description={{ embyserver_service_name }} service
 After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStartPre=-/usr/bin/docker rm -f embyserver.service
-ExecStartPre=/usr/bin/docker pull emby/embyserver:latest
+ExecStartPre=-/usr/bin/docker rm -f {{ embyserver_service_name }}.service
+ExecStartPre=/usr/bin/docker pull emby/embyserver:{{ embyserver_version }}
 
 ExecStart=/usr/bin/docker run \
-    --name embyserver.service \
-    --volume /srv/embyserver/config:/config \
-    --publish 0.0.0.0:8096:8096 \
-    --publish 0.0.0.0:8920:8920 \
-    --env UID=666 \
-    --env GID=666 \
-    --env GIDLIST=666 \
-    emby/embyserver:latest
+    --name {{ embyserver_service_name }}.service \
+    --volume {{ embyserver_config_volume_directory }}:/config \
+{% for share in embyserver_shares %}
+    --volume {{ share.path }}:/mnt/{{ share.name }} \
+{% endfor %}
+{% if embyserver_direct_rendering_enabled is defined and embyserver_direct_rendering_enabled | bool %}
+    --device /dev/dri:/dev/dri \
+{% endif %}
+    --publish {{ embyserver_interface }}:{{ embyserver_http_port }}:8096 \
+    --publish {{ embyserver_interface }}:{{ embyserver_https_port }}:8920 \
+    --env UID={{ embyserver_user_id }} \
+    --env GID={{ embyserver_group_id }} \
+    --env GIDLIST={{ embyserver_group_id }} \
+    emby/embyserver:{{ embyserver_version }}
 
-ExecStop=/usr/bin/docker stop embyserver.service
-ExecStopPost=-/usr/bin/docker rm -f embyserver.service
+ExecStop=/usr/bin/docker stop {{ embyserver_service_name }}.service
+ExecStopPost=-/usr/bin/docker rm -f {{ embyserver_service_name }}.service
 
 Restart=always
 RestartSec=60s
