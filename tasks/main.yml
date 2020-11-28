@@ -1,2 +1,9 @@
 ---
-# tasks file for ansible_embyserver
+- name: create systemd unit file
+  template:
+    src: embyserver.systemd.j2
+    dest: "/etc/systemd/system/{{ embyserver_service_name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart embyserver service
