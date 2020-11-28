@@ -1,7 +1,7 @@
 ---
 - name: Converge
   hosts: all
-  tasks:
-    - name: "Include ansible_embyserver"
-      include_role:
-        name: "ansible_embyserver"
+  become: true
+
+  roles:
+    - role: ansible_embyserver
