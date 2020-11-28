@@ -51,3 +51,29 @@
         and config_volume_directory.stat.gid == 666
         and config_volume_directory.stat.mode == '0750'
         )
+
+    - name: Should open 8096/tcp port
+      command: nc -z -w1 localhost 8096
+      changed_when: false
+      register: netcat_8096
+      retries: 300
+      delay: 1
+      until: netcat_8096 is defined
+        and netcat_8096.rc == 0
+      when: not (
+        molecule_docker_environment is defined
+        and molecule_docker_environment | bool
+        )
+
+    - name: Should open 8920/tcp port
+      command: nc -z -w1 localhost 8920
+      changed_when: false
+      register: netcat_8920
+      retries: 300
+      delay: 1
+      until: netcat_8920 is defined
+        and netcat_8920.rc == 0
+      when: not (
+        molecule_docker_environment is defined
+        and molecule_docker_environment | bool
+        )
