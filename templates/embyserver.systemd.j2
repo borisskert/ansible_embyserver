@@ -13,6 +13,12 @@ ExecStartPre=/usr/bin/docker pull emby/embyserver:{{ embyserver_version }}
 ExecStart=/usr/bin/docker run \
     --name {{ embyserver_service_name }}.service \
     --volume {{ embyserver_config_volume_directory }}:/config \
+{% if embyserver_transcoding_temp_volume_directory is defined and embyserver_transcoding_temp_volume_directory | length > 0 %}
+    --volume {{ embyserver_transcoding_temp_volume_directory }}:/config/transcoding-temp \
+{% endif %}
+{% if embyserver_log_volume_directory is defined and embyserver_log_volume_directory | length > 0 %}
+    --volume {{ embyserver_log_volume_directory }}:/config/logs \
+{% endif %}
 {% for share in embyserver_shares %}
     --volume {{ share.path }}:/mnt/{{ share.name }} \
 {% endfor %}

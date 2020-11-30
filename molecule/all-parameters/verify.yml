@@ -27,6 +27,8 @@
           ExecStart=/usr/bin/docker run \
               --name my_embyserver.service \
               --volume /srv/my_embyserver/config:/config \
+              --volume /srv/my_embyserver/tmp:/config/transcoding-temp \
+              --volume /srv/my_embyserver/log:/config/logs \
               --volume /srv/my_embyserver/movies:/mnt/movies \
               --volume /srv/my_embyserver/tv:/mnt/tv \
               --device /dev/dri:/dev/dri \
@@ -53,4 +55,52 @@
         and config_volume_directory.stat.uid == 777
         and config_volume_directory.stat.gid == 888
         and config_volume_directory.stat.mode == '0750'
+        )
+
+    - name: Should create transcoding-temp volume directory
+      stat:
+        path: /srv/my_embyserver/tmp
+      register: transcoding_temp_volume_directory
+      failed_when: not (
+        transcoding_temp_volume_directory.stat.exists
+        and transcoding_temp_volume_directory.stat.uid == 777
+        and transcoding_temp_volume_directory.stat.gid == 888
+        and transcoding_temp_volume_directory.stat.mode == '0750'
+        )
+
+    - name: Should create log volume directory
+      stat:
+        path: /srv/my_embyserver/log
+      register: transcoding_log_volume_directory
+      failed_when: not (
+        transcoding_log_volume_directory.stat.exists
+        and transcoding_log_volume_directory.stat.uid == 777
+        and transcoding_log_volume_directory.stat.gid == 888
+        and transcoding_log_volume_directory.stat.mode == '0750'
+        )
+
+    - name: Should open 18096/tcp port
+      command: nc -z -w1 localhost 18096
+      changed_when: false
+      register: netcat_18096
+      retries: 300
+      delay: 1
+      until: netcat_18096 is defined
+        and netcat_18096.rc == 0
+      when: not (
+        molecule_docker_environment is defined
+        and molecule_docker_environment | bool
+        )
+
+    - name: Should open 18920/tcp port
+      command: nc -z -w1 localhost 18920
+      changed_when: false
+      register: netcat_18920
+      retries: 300
+      delay: 1
+      until: netcat_18920 is defined
+        and netcat_18920.rc == 0
+      when: not (
+        molecule_docker_environment is defined
+        and molecule_docker_environment | bool
         )

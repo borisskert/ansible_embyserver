@@ -19,3 +19,5 @@
         - name: tv
           path: /srv/my_embyserver/tv
       embyserver_direct_rendering_enabled: true
+      embyserver_transcoding_temp_volume_directory: /srv/my_embyserver/tmp
+      embyserver_log_volume_directory: /srv/my_embyserver/log

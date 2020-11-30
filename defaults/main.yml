@@ -3,6 +3,8 @@ embyserver_version: latest
 embyserver_service_name: embyserver
 
 embyserver_config_volume_directory: /srv/embyserver/config
+embyserver_transcoding_temp_volume_directory: ''
+embyserver_log_volume_directory: ''
 
 embyserver_user_id: 666
 embyserver_group_id: 666

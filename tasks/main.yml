@@ -16,6 +16,26 @@
     group: "{{ embyserver_group_id | int }}"
     mode: 0750
 
+- name: create transcoding-temp volume directory
+  file:
+    path: "{{ embyserver_transcoding_temp_volume_directory }}"
+    state: directory
+    owner: "{{ embyserver_user_id | int }}"
+    group: "{{ embyserver_group_id | int }}"
+    mode: 0750
+  when: embyserver_transcoding_temp_volume_directory is defined
+    and embyserver_transcoding_temp_volume_directory | length > 0
+
+- name: create log volume directory
+  file:
+    path: "{{ embyserver_log_volume_directory }}"
+    state: directory
+    owner: "{{ embyserver_user_id | int }}"
+    group: "{{ embyserver_group_id | int }}"
+    mode: 0750
+  when: embyserver_log_volume_directory is defined
+    and embyserver_log_volume_directory | length > 0
+
 - name: Start systemd-managed docker containers
   meta: flush_handlers
 
